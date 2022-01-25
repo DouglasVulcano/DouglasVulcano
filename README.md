@@ -6,7 +6,7 @@
 <hr>
 
 ### Social Networks
-[<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />](https://www.linkedin.com/in/douglas-da-silva-vulcano/) [<img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" />](mailto:vulcanodouglas1708@gmail.com)
+[<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />](https://www.linkedin.com/in/douglas-da-silva-vulcano/) <a href="mailto:tassiofernandescosta@gmail.com" alt="gmail" target="_blank"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
 
 <hr>
 
@@ -16,3 +16,4 @@
 <hr>
 
 <img width='400' src="https://github-readme-stats.vercel.app/api?username=DouglasVulcano" />
+

@@ -21,4 +21,4 @@
 
 <hr>
 
-<img width='200' src="https://github-readme-stats.vercel.app/api/top-langs/?username=DouglasVulcano" />
+<img width='400' src="https://github-readme-stats.vercel.app/api?username=DouglasVulcano" />

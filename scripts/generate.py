@@ -1,4 +1,4 @@
-"""Gera os SVGs animados do README do perfil (assets/header.svg e assets/terminal.svg).
+"""Gera os SVGs animados do README do perfil (assets/header.svg).
 
 As fontes (Space Grotesk e JetBrains Mono, OFL) são recortadas para os caracteres usados e
 embutidas em base64, porque o GitHub não deixa um SVG em <img> baixar arquivos externos.
@@ -29,7 +29,6 @@ ASH_400 = "#8d96a4"
 EMBER_300 = "#ffb454"
 EMBER_400 = "#ff8a3d"
 EMBER_500 = "#ff6a2b"
-OK = "#34d399"
 
 GLYPHS = "{}()<>[];=/*+-_:.#$&|!?01fnletconstreturnasyncawait"
 REDUCED = "@media (prefers-reduced-motion: reduce) { * { animation: none !important; } .in, .fin { opacity: 1 !important; } }"
@@ -191,113 +190,6 @@ def header() -> None:
     (OUT / "header.svg").write_text("\n".join(parts))
 
 
-# --------------------------------------------------------------------------- terminal
-def terminal() -> None:
-    W = 880
-    steps = [
-        ("whoami", [("douglas-vulcano · desenvolvedor full stack", ASH_300)]),
-        (
-            "cat stack.json",
-            [
-                ("{", ASH_400),
-                ('  "backend":  ["Node.js", "NestJS", "REST", "PostgreSQL"],', EMBER_300),
-                ('  "frontend": ["Next.js", "React", "TypeScript"],', EMBER_300),
-                ('  "cloud":    ["Docker", "AWS", "CI/CD"],', EMBER_300),
-                ('  "ai":       ["Claude Code", "Copilot", "Gemini"]', EMBER_300),
-                ("}", ASH_400),
-            ],
-        ),
-        ("ls ~/produtos", [("nexo/    zeroth/", OK)]),
-        ("git log --oneline -1", [("feat: construindo o próximo produto", ASH_300)]),
-    ]
-    char_w, line_h, pad_x, top = 9.6, 25, 30, 78
-    all_text = "".join(c for s in steps for c in s[0]) + "".join(t for s in steps for t, _ in s[1]) + "❯ douglas@vulcano: ~"
-    css = [
-        font_face("Mono", "jetbrains-mono-latin-wght-normal.woff2", 400, all_text),
-        font_face("MonoB", "jetbrains-mono-latin-wght-normal.woff2", 600, "❯"),
-        """
-        text{font-family:'Mono',ui-monospace,monospace;font-size:16px;white-space:pre}
-        .p{font-family:'MonoB','Mono',monospace}
-        .cover{animation-fill-mode:both;animation-timing-function:steps(var(--n))}
-        @keyframes type{from{transform:translateX(0)}to{transform:translateX(var(--w))}}
-        .out{opacity:0;animation:out .35s ease-out forwards}
-        @keyframes out{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-        .caret{opacity:0;animation:show 0s linear forwards, blink 1s steps(2) infinite}
-        @keyframes show{to{opacity:1}}
-        @keyframes blink{50%{fill-opacity:0}}
-        .beam{animation:spin 7s linear infinite;transform-box:view-box}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        """,
-        REDUCED,
-        "@media (prefers-reduced-motion: reduce){.cover{display:none}.out,.caret{opacity:1 !important}}",
-    ]
-    rows = []
-    y = top
-    t = 0.75
-    type_ms, pause = 0.055, 0.45
-    for cmd, out in steps:
-        n = len(cmd)
-        dur = n * type_ms
-        width = n * char_w + 2
-        rows.append(
-            f'<g class="out" style="animation-delay:{t - 0.15:.2f}s">'
-            f'<text x="{pad_x}" y="{y}" fill="{EMBER_400}" class="p">❯</text>'
-            f'<text x="{pad_x + 22}" y="{y}" fill="{ASH_100}">{esc(cmd)}</text></g>'
-        )
-        rows.append(
-            f'<rect class="cover" x="{pad_x + 20}" y="{y - 18}" width="{width + 12}" height="24" fill="#0d1015" '
-            f'style="--n:{n};--w:{width + 12}px;animation-name:type;animation-duration:{dur:.2f}s;animation-delay:{t:.2f}s"/>'
-        )
-        t += dur + pause
-        y += line_h
-        for text, color in out:
-            rows.append(
-                f'<text class="out" x="{pad_x}" y="{y}" fill="{color}" style="animation-delay:{t:.2f}s">{esc(text)}</text>'
-            )
-            t += 0.07
-            y += line_h
-        t += pause
-        y += 10
-    rows.append(f'<text class="out" x="{pad_x}" y="{y}" fill="{EMBER_400}" style="animation-delay:{t:.2f}s">❯</text>')
-    rows.append(
-        f'<rect class="caret" x="{pad_x + 22}" y="{y - 15}" width="9" height="19" fill="{EMBER_400}" '
-        f'style="animation-delay:{t:.2f}s,{t:.2f}s"/>'
-    )
-    H = y + 34
-
-    parts = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-labelledby="tt td">',
-        '<title id="tt">Terminal de Douglas Vulcano</title>',
-        '<desc id="td">Terminal digitando: whoami, a stack em JSON (Node.js, NestJS, Next.js, React, TypeScript, '
-        "Docker, AWS e ferramentas de IA) e os produtos Nexo e Zeroth.</desc>",
-        f"<style>{''.join(css)}</style>",
-        "<defs>",
-        f'<clipPath id="win"><rect width="{W}" height="{H}" rx="16"/></clipPath>',
-        '<linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">'
-        '<stop offset="0" stop-color="#ff6a2b" stop-opacity="0"/><stop offset=".85" stop-color="#ff6a2b"/>'
-        '<stop offset="1" stop-color="#ffb454"/></linearGradient>',
-        f'<mask id="ring"><rect width="{W}" height="{H}" rx="16" fill="#fff"/>'
-        f'<rect x="1.5" y="1.5" width="{W - 3}" height="{H - 3}" rx="14.5" fill="#000"/></mask>',
-        "</defs>",
-        '<g clip-path="url(#win)">',
-        f'<rect width="{W}" height="{H}" fill="#0d1015"/>',
-        f'<rect width="{W}" height="46" fill="#11151c"/>',
-        f'<rect y="46" width="{W}" height="1" fill="#1f2530"/>',
-        '<circle cx="26" cy="23" r="6.5" fill="#ff5f57"/><circle cx="48" cy="23" r="6.5" fill="#febc2e"/>'
-        '<circle cx="70" cy="23" r="6.5" fill="#28c840"/>',
-        f'<text x="94" y="28" fill="{ASH_400}" font-size="13">douglas@vulcano: ~</text>',
-        *rows,
-        "</g>",
-        f'<rect width="{W}" height="{H}" rx="16" fill="none" stroke="#1f2530"/>',
-        # A beam of light that travels along the border (rotated gradient, masked to the ring).
-        f'<g mask="url(#ring)"><rect class="beam" x="{W / 2}" y="{H / 2 - 70}" width="{W}" height="140" '
-        f'fill="url(#beam)" style="transform-origin:{W / 2}px {H / 2}px"/></g>',
-        "</svg>",
-    ]
-    (OUT / "terminal.svg").write_text("\n".join(parts))
-
-
 header()
-terminal()
 for f in sorted(OUT.glob("*.svg")):
     print(f.name, f"{f.stat().st_size / 1024:.1f} KB")
